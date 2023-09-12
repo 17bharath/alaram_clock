@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Clock</title>
+    <style>
+        body {
+            padding-top: 50px;
+            background-color: rgb(154, 248, 241);
+            text-align: center;
+        }
+
+        input {
+            border-radius: 5px;
+            border: solid;
+            width: 100px;
+            height: 20px;
+        }
+
+        input:hover,
+        button:hover,
+        select:hover {
+            transform: scale(1.1);
+        }
+
+        button:hover,
+        select:hover {
+            cursor: pointer;
+        }
+
+        button,
+        select {
+            border-radius: 5px;
+            border: solid;
+            height: 25px;
+        }
+
+        button {
+            width: 120px;
+            height: 27px;
+            background: rgb(50, 180, 240);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="clock">
+        <h1 id="clock-display">12:00:00 AM</h1>
+    </div>
+    <div class="alarm-form">
+        <h2>Set Your Alarm. Don't miss the Time!</h2>
+        <input type="number" id="hour" placeholder="Hour" min="1" max="12">
+        <input type="number" id="minute" placeholder="Minute" min="0" max="59">
+        <input type="number" id="second" placeholder="Second" min="0" max="59">
+        <select id="ampm">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+        </select>
+        <br>
+        <br>
+        <button onclick="setAlarm()">Set Alarm</button>
+    </div>
+    <div class="alarm-list">
+        <h2>Your Alarms</h2>
+        <ul id="alarm-list">
+        </ul>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const ampm = hours >= 12 ? "PM" : "AM";
+            const formattedTime = `${hours % 12}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${ampm}`;
+            document.getElementById("clock-display").textContent = formattedTime;
+        }
+
+        function setAlarm() {
+            const hour = parseInt(document.getElementById("hour").value);
+            const minute = parseInt(document.getElementById("minute").value);
+            const second = parseInt(document.getElementById("second").value);
+            const ampm = document.getElementById("ampm").value;
+
+            const alarmTime = `${hour}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')} ${ampm}`;
+
+            const listItem = document.createElement("p");
+            listItem.textContent = alarmTime;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = function () {
+                listItem.remove();
+            };
+            listItem.appendChild(deleteButton);
+            document.getElementById("alarm-list").appendChild(listItem);
+            checkAlarms();
+        }
+
+        function checkAlarms() {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentSecond = now.getSeconds();
+            const currentAmPm = currentHour >= 12 ? "PM" : "AM";
+            const alarms = document.querySelectorAll("#alarm-list li");
+            alarms.forEach(alarm => {
+                const alarmTime = alarm.textContent.split(" ")[0];
+                const [alarmHour, alarmMinute, alarmSecond] = alarmTime.split(":");
+                const alarmAmPm = alarm.textContent.split(" ")[1];
+
+                if (
+                    currentHour === parseInt(alarmHour) &&
+                    currentMinute === parseInt(alarmMinute) &&
+                    currentSecond === parseInt(alarmSecond) &&
+                    currentAmPm === alarmAmPm
+                ) {
+                    alert("Alarm triggered!");
+                    alarm.remove();
+                }
+            });
+        }
+
+        setInterval(updateClock, 1000);
+
+        setInterval(checkAlarms, 1000);
+    </script>
+</body>
+
+</html>
